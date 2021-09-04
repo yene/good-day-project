@@ -7,7 +7,7 @@
         {{ question.question }}
       </div>
       <div>
-        <select v-model="question.response" placeholder="asdf">
+        <select v-model="question.answerID" placeholder="asdf">
           <option value="" selected disabled hidden>
             {{ question.placeholder }}
           </option>
@@ -30,7 +30,7 @@ import { questions } from "./questions.js";
 
 // initialize answers with empty
 for (let i = 0; i < questions.length; i++) {
-  questions[i].response = "";
+  questions[i].answerID = "";
 }
 
 export default {
@@ -42,16 +42,30 @@ export default {
   },
   methods: {
     submitAnswers() {
-      let data = this.questions;
-      let url = "http://localhost:3000/api/answer";
+      let answers = [];
+      for (let q of this.questions) {
+        if (q.answerID === "") {
+          continue;
+        }
+        let choosenAnswer = q.answers.find((a) => {
+          return a.id == q.answerID;
+        });
+        answers.push({
+          id: q.id,
+          question: q.question,
+          answerID: q.answerID,
+          answer: choosenAnswer.text,
+        });
+      }
+      let url = "/api/answer";
       fetch(url, {
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(answers, null, 2),
       })
-        .then((response) => {
-          return response.json();
+        .then((r) => {
+          return r.json();
         })
         .then((data) => console.log("Response", data));
     },

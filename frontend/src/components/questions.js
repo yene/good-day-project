@@ -13,7 +13,7 @@ export let questions = [
   },
   {
     id: 1,
-    question: '👥 I worked with other people	',
+    question: '👥 I worked with other people',
     placeholder: 'How much?...',
     answers: [
       {text: 'None of the day', id: 'terrible'},

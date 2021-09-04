@@ -1,11 +1,14 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type Response struct {
@@ -13,26 +16,27 @@ type Response struct {
 	ErrorCode int
 }
 
-type Questions []struct {
-	ID          int    `json:"id"`
-	Question    string `json:"question"`
-	Placeholder string `json:"placeholder"`
-	Answers     []struct {
-		Text string `json:"text"`
-		ID   string `json:"id"`
-	} `json:"answers"`
-	Response string `json:"response"`
-}
+//go:embed frontend/dist
+var staticFiles embed.FS
+
+var exPath string
 
 func main() {
-	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/public/", http.StripPrefix("/public/", fs))
+	var staticFS = fs.FS(staticFiles)
+	htmlContent, err := fs.Sub(staticFS, "frontend/dist")
+	if err != nil {
+		panic(err)
+	}
+	fs := http.FileServer(http.FS(htmlContent))
+	http.Handle("/", fs)
 
-	// TODO: serve frontend
-
-	http.HandleFunc("/", frontend)
-	// TODO: handle answers
 	http.HandleFunc("/api/answer", answer)
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath = filepath.Dir(ex)
+	fmt.Println("Please open http://localhost:3000")
 	http.ListenAndServe(":3000", nil)
 }
 
@@ -46,8 +50,9 @@ func answer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	content, _ := ioutil.ReadAll(r.Body)
-	_ = os.WriteFile("./answers.json", content, 0644)
-	fmt.Println("stored answers in answers.json")
+	p := exPath + "/answers.json"
+	_ = os.WriteFile(p, content, 0644)
+	fmt.Println("stored answers in ", p)
 
 	response := Response{}
 	jsonResponse, err := json.Marshal(response)
@@ -58,20 +63,3 @@ func answer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
 }
-
-func frontend(w http.ResponseWriter, r *http.Request) {
-	response := Response{}
-
-	js, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
-}
-
-// HTTP errors
-//http.Error(w, http.StatusText(500), 500)
-//http.Error(w, err.Error(), http.StatusInternalServerError)
