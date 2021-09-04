@@ -2,41 +2,61 @@
   <div class="hello">
     <h1>Saturday, August 2. 2021</h1>
     <p>Hope you had a good day today! Tell us about it:</p>
-    <div>
+    <div v-for="question in questions" :key="question.id">
       <div>
-        🤔 How was your workday?
+        {{ question.question }}
       </div>
       <div>
-        <select v-model="selectedAnswer" placeholder="asdf">
-          <option value="" selected disabled hidden>I feel...</option>
-          <option v-for="(answer) in answers" :key="answer.id" :value="answer.id">
-            {{answer.text}}
+        <select v-model="question.response" placeholder="asdf">
+          <option value="" selected disabled hidden>
+            {{ question.placeholder }}
+          </option>
+          <option
+            v-for="answer in question.answers"
+            :key="answer.id"
+            :value="answer.id"
+          >
+            {{ answer.text }}
           </option>
         </select>
       </div>
     </div>
+    <button v-on:click="submitAnswers">Submit</button>
   </div>
 </template>
 
 <script>
+import { questions } from "./questions.js";
+
+// initialize answers with empty
+for (let i = 0; i < questions.length; i++) {
+  questions[i].response = "";
+}
+
 export default {
-  name: 'GoodDay',
+  name: "GoodDay",
   data() {
     return {
-      selectedAnswer: '',
-      answers: [
-        {text: 'Terrible', id: 'terrible'},
-        {text: 'Bad', id: 'bad'},
-        {text: 'OK', id: 'ok'},
-        {text: 'Good', id: 'good'},
-        {text: 'Awesome', id: 'awesome'}
-      ]
-    }
+      questions: questions,
+    };
   },
-  props: {
-    msg: String
-  }
-}
+  methods: {
+    submitAnswers() {
+      let data = this.questions;
+      let url = "http://localhost:3000/api/answer";
+      fetch(url, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => console.log("Response", data));
+    },
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -55,6 +75,4 @@ li {
 a {
   color: #42b983;
 }
-
-
 </style>

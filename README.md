@@ -3,6 +3,7 @@
 Inspired by [Github's Good Day Project](https://github.blog/2021-05-25-octoverse-spotlight-good-day-project/)
 
 ## Features and Todos
+
 - [ ] Go backend that handles answers
 - [ ] Single binary
 - [ ] Vue.js frontend with the questions
@@ -11,8 +12,10 @@ Inspired by [Github's Good Day Project](https://github.blog/2021-05-25-octoverse
 - [ ] favicon.ico
 
 ## What I did
-* Create frontend with vue-cli (vue version 2, no TS)
-*
+
+- Create frontend with vue-cli (vue version 2, no TS)
+- Classic, if you get an empty POST response then cross-origin is missing.
 
 ## links
-*
+
+-
