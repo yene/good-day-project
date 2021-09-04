@@ -1,5 +1,6 @@
 # The Good Day Project
 
+A simple website that asks you how your day was, and stores response locally.
 Website and Server are a single binary.
 
 Inspired by [Github's Good Day Project](https://github.blog/2021-05-25-octoverse-spotlight-good-day-project/)
