@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <h1>Saturday, August 2. 2021</h1>
+    <h1>{{ today() }}</h1>
     <p>Hope you had a good day today! Tell us about it:</p>
     <div v-for="question in questions" :key="question.id">
       <div>
@@ -21,7 +21,7 @@
         </select>
       </div>
     </div>
-    <button v-on:click="submitAnswers">Submit</button>
+    <button v-on:click="submitAnswers">Save my response</button>
   </div>
 </template>
 
@@ -41,6 +41,17 @@ export default {
     };
   },
   methods: {
+    today() {
+      let lang = (lang = navigator.language);
+      let d = new Date();
+      let options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      return d.toLocaleDateString(lang, options);
+    },
     submitAnswers() {
       let answers = [];
       for (let q of this.questions) {

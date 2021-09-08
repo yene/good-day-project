@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Response struct {
@@ -25,7 +27,7 @@ func main() {
 	var staticFS = fs.FS(staticFiles)
 	htmlContent, err := fs.Sub(staticFS, "frontend/dist")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	fs := http.FileServer(http.FS(htmlContent))
 	http.Handle("/", fs)
@@ -33,9 +35,14 @@ func main() {
 	http.HandleFunc("/api/answer", answer)
 	ex, err := os.Executable()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	exPath = filepath.Dir(ex)
+	err = os.Mkdir(exPath+"/answers", 0755)
+	if err != nil && !os.IsExist(err) {
+		log.Fatal(err)
+	}
+
 	fmt.Println("Please open http://localhost:3000")
 	http.ListenAndServe(":3000", nil)
 }
@@ -50,7 +57,9 @@ func answer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	content, _ := ioutil.ReadAll(r.Body)
-	p := exPath + "/answers.json"
+
+	d := time.Now().Format("2006-01-02")
+	p := exPath + "/answers/" + d + ".json"
 	_ = os.WriteFile(p, content, 0644)
 	fmt.Println("stored answers in ", p)
 

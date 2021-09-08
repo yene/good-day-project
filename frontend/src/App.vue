@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import GoodDay from './components/GoodDay.vue'
+import GoodDay from "./components/GoodDay.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    GoodDay
-  }
-}
+    GoodDay,
+  },
+};
 </script>
 
 <style>
@@ -22,6 +22,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 10px;
 }
 </style>
